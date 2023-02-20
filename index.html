@@ -1,49 +1,61 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<script type="text/javascript" src="./context.js"></script>
-		<style type="text/css">
-			.container {
-				margin: 0 auto;
-				text-align: center;
+
+<head>
+	<script type="text/javascript" src="./context.js"></script>
+	<style type="text/css">
+		.container {
+			margin: 0 auto;
+			text-align: center;
+		}
+
+		.inline {
+			display: inline-block;
+		}
+
+		#scene {
+			border: 1px solid black;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<p class="inline">目标为：</p>
+		<input id="lvlText" type="text" size="3" value="3" />
+		<p class="inline">级材料</p>
+		<input id="numText" type="text" size="3" value="16" />
+		<p class="inline">个</p>
+	</div>
+	<div class="container">
+		<p class="inline">当前拥有的物品序列：</p>
+		<input id="inputText" type="text" size="20" />
+	</div>
+	<div class="container">
+		<p class="inline">点击</p>
+		<input id="runBtn" type="button" value="运行" onclick="run()" />
+		<p class="inline">得到结果：</p>
+	</div>
+	<div class="container">
+		<p id="resultTextDefault"></p>
+		<p id="resultTextReturn"></p>
+		<p id="resultTextDouble"></p>
+	</div>
+	<div class="container">
+		<p class="inline">其他设置：</p>
+		<p class="inline">模拟重复次数：</p>
+		<input id="repText" type="text" size="3" value="1000" />
+		<p class="inline">次</p>
+	</div>
+	<script>
+		var input = document.getElementById("inputText");
+		input.addEventListener("keypress", function (event) {
+			if (event.key === "Enter") {
+				event.preventDefault();
+				document.getElementById("runBtn").click();
 			}
-		
-			.inline {
-				display: inline-block;
-			}
-	
-			#scene {
-				border: 1px solid black;
-			}
-		</style>
-	</head>
-	<body>
-		<div class="container">
-			<p class="inline">目标为：</p>
-			<input id="lvlText" type="text" size="3" value="3"/>
-			<p class="inline">级材料</p>
-			<input id="numText" type="text" size="3" value="16"/>
-			<p class="inline">个</p>
-		</div>
-		<div class="container">
-			<p class="inline">当前拥有的物品序列：</p>
-			<input id="inputText" type="text" size="20"/>
-		</div>
-		<div class="container">
-			<p class="inline">点击</p>
-			<input type="button" value="运行" onclick="run()"/>
-			<p class="inline">得到结果：</p>
-		</div>
-		<div class="container">
-			<p id="resultTextDefault"></p>
-			<p id="resultTextReturn"></p>
-			<p id="resultTextDouble"></p>
-		</div>
-		<div class="container">
-			<p class="inline">其他设置：</p>
-			<p class="inline">模拟重复次数：</p>
-			<input id="repText" type="text" size="3" value="1000"/>
-			<p class="inline">次</p>
-		</div>
-	</body>
+		});
+	</script>
+</body>
+
 </html>
