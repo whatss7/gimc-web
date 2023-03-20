@@ -80,3 +80,12 @@ function run(){
 		document.getElementById("resultTextDouble").textContent = "";
 	}
 }
+
+function setval(num, lvl){
+	document.getElementById("numText").value = num;
+	document.getElementById("lvlText").value = lvl;
+}
+
+function chghide(){
+	document.getElementById('fastbtns').hidden = !document.getElementById('fastbtns').hidden;
+}
