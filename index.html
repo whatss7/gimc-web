@@ -42,17 +42,26 @@
 			<input id="numText" type="number" value="16" style="width: 100%; min-width: 0" />
 			<p>个</p>
 		</div>
+		<div class="flexdiv">
+			<p>类型为：</p>
+			<input type="radio" name="material_type" id="type_weapon" />
+			<label for="type_weapon">武器</label>
+			<input type="radio" name="material_type" id="type_talent" checked />
+			<label for="type_talent">天赋</label>
+			<input type="radio" name="material_type" id="type_others" />
+			<label for="type_others">其他</label>
+		</div>
 		<div class="flexdiv" style="flex-direction: column;">
 			<input type="button" value="显示/隐藏快捷按钮" onclick="chghide()" style="width: 100%" />
 		</div>
 		<div id="fastbtns" hidden>
 			<div class="flexdiv" style="flex-direction: column;">
-				<input type="button" style="width: 100%; margin: 5px;" value="12个3级（天赋8-9级）" onclick="setval(12, 3)" />
-				<input type="button" style="width: 100%; margin: 5px;" value="16个3级（天赋9-10级）" onclick="setval(16, 3)" />
-				<input type="button" style="width: 100%; margin: 5px;" value="24个3级（角色80级突破）" onclick="setval(24, 3)" />
-				<input type="button" style="width: 100%; margin: 5px;" value="3个4级（三星武器80级突破）" onclick="setval(3, 4)" />
-				<input type="button" style="width: 100%; margin: 5px;" value="4个4级（四星武器80级突破）" onclick="setval(4, 4)" />
-				<input type="button" style="width: 100%; margin: 5px;" value="6个4级（五星武器80级突破）" onclick="setval(6, 4)" />
+				<input type="button" style="width: 100%; margin: 5px;" value="12个3级（天赋8-9级）" onclick="setval(12, 3, 1)" />
+				<input type="button" style="width: 100%; margin: 5px;" value="16个3级（天赋9-10级）" onclick="setval(16, 3, 1)" />
+				<input type="button" style="width: 100%; margin: 5px;" value="24个3级（角色80级突破）" onclick="setval(24, 3, 2)" />
+				<input type="button" style="width: 100%; margin: 5px;" value="3个4级（三星武器80级突破）" onclick="setval(3, 4, 0)" />
+				<input type="button" style="width: 100%; margin: 5px;" value="4个4级（四星武器80级突破）" onclick="setval(4, 4, 0)" />
+				<input type="button" style="width: 100%; margin: 5px;" value="6个4级（五星武器80级突破）" onclick="setval(6, 4, 0)" />
 			</div>
 		</div>
 		<div class="flexdiv">
@@ -65,9 +74,9 @@
 			<p class="inline">得到结果：</p>
 		</div>
 		<div>
-			<p id="resultTextDefault"></p>
-			<p id="resultTextReturn"></p>
-			<p id="resultTextDouble"></p>
+			<p id="resultTextDefault">欢迎使用 gimc-web</p>
+			<p id="resultTextReturn">请在“当前拥有的物品序列”中从高到低输入你所拥有的材料数目，低级没有需补 0，例如"7 15 0"</p>
+			<p id="resultTextDouble">然后选择你的目标材料等级和数目，点击“运行”，这里就会显示计算结果</p>
 		</div>
 		<div class="flexdiv">
 			<p>其他设置：</p>
