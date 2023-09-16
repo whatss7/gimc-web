@@ -109,33 +109,35 @@ function runsingle(arr, mode, lvl, num, type) {
     else if (type == "talent") drop_pack = [880, 792, 88];
     else throw Error();
 
-    while (true) {
-        var arr_temp = [];
-        arr_copy.forEach(i => { arr_temp.push(i); });
-        for (var i = 0; i < drop_pack.length; i++) {
-            arr_temp[i] = arr_temp[i] + drop_pack[i] * drop_pack_multiplier;
-        }
-        arr_temp = merge(arr_temp, mode, lvl);
-        if (ascending) {
-            if (arr_temp[lvl - 1] < num) {
-                arr_copy = arr_temp;
-                addcnt += drop_pack_count * drop_pack_multiplier;
-                drop_pack_multiplier *= 2;
+    var base_num = num * Math.pow(3, lvl - 1);
+    if (base_num > 10000) {
+        while (true) {
+            var arr_temp = [];
+            arr_copy.forEach(i => { arr_temp.push(i); });
+            for (var i = 0; i < drop_pack.length; i++) {
+                arr_temp[i] = arr_temp[i] + drop_pack[i] * drop_pack_multiplier;
             }
-            else {
-                ascending = false;
+            arr_temp = merge(arr_temp, mode, lvl);
+            if (ascending) {
+                if (arr_temp[lvl - 1] < num) {
+                    arr_copy = arr_temp;
+                    addcnt += drop_pack_count * drop_pack_multiplier;
+                    drop_pack_multiplier *= 2;
+                }
+                else {
+                    ascending = false;
+                    drop_pack_multiplier /= 2;
+                }
+            } else {
+                if (arr_temp[lvl - 1] < num) {
+                    arr_copy = arr_temp;
+                    addcnt += drop_pack_count * drop_pack_multiplier;
+                }
                 drop_pack_multiplier /= 2;
+                if (drop_pack_multiplier <= 1) break;
             }
-        } else {
-            if (arr_temp[lvl - 1] < num) {
-                arr_copy = arr_temp;
-                addcnt += drop_pack_count * drop_pack_multiplier;
-            }
-            drop_pack_multiplier /= 2;
-            if (drop_pack_multiplier <= 1) break;
         }
     }
-
     while (arr_copy[lvl - 1] < num) {
         addcnt += 1;
         gendrop(arr_copy, type);
