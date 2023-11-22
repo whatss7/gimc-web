@@ -146,17 +146,33 @@ function runsingle(arr, mode, lvl, num, type) {
     return [result, addcnt];
 }
 
+function isdigit(chr) {
+    var cc = chr.charCodeAt(0);
+    return cc >= 48 && cc <= 57;
+}
+
 function runimpl(seq_str, lvl, num, rep, type) {
     lvl = Number(lvl);
     if (lvl > 10) throw new Error();
     num = Number(num);
     rep = Number(rep);
-    seq_str_pre = ""
+    var seq_str_pre = ""
     for (var i = 0; i < seq_str.length; i++) {
-        var cc = seq_str.charCodeAt(i);
-        if (cc < 48 || cc > 57) seq_str_pre += " ";
-        else seq_str_pre += seq_str[i];
+        if (isdigit(seq_str[i])){
+            seq_str_pre += seq_str[i];
+        }
+        else {
+            if ((seq_str[i] == "-") && 
+                (i == 0 || !isdigit(seq_str[i - 1]) && seq_str[i - 1] != "-") &&
+                (i != seq_str.length - 1 && isdigit(seq_str[i + 1]))
+            ) {
+                seq_str_pre += "-";
+            } else if (!seq_str_pre.endsWith(" ")) {
+                seq_str_pre += " ";
+            }
+        }
     }
+    console.log(seq_str_pre);
     seq_str_pre = seq_str_pre.trim();
     var str_arr = seq_str_pre.split(" ");
     console.log(str_arr);
