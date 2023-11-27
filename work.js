@@ -1,3 +1,85 @@
+//#region Drop
+// Get drop table.
+function get_drop_table(type) {
+    if (type == "weapon") {
+        return {
+            lvl1: 2.2,
+            pack: 3.1,
+            rate_table: [0, 0.775, 0.2, 0.025]
+        };
+    } else if (type == "talent") {
+        return {
+            lvl1: 2.2,
+            pack: 2.2,
+            rate_table: [0, 0.9, 0.1]
+        };
+    } else throw new Error();
+}
+
+// Adds drop to base_arr. This function modifies base_arr.
+function gen_drop(base_arr, type) {
+    // Get drop table
+    var drop_table = get_drop_table(type);
+    var lvl1_base = Math.floor(drop_table.lvl1);
+    var lvl1_rate = drop_table.lvl1 - lvl1_base;
+    var pack_base = Math.floor(drop_table.pack);
+    var pack_rate = drop_table.pack - pack_base;
+    var rate_table = drop_table.rate_table;
+
+    // Generate extra drops
+    if (Math.random() < lvl1_rate) lvl1_base += 1;
+    if (Math.random() < pack_rate) pack_base += 1;
+    base_arr[0] += lvl1_base;
+
+    // Generate drop levels
+    for (var i = 0; i < pack_base; i++) {
+        var v = Math.random();
+        var rate_sum = 0;
+        for (var j = 0; j < rate_table.length; j++) {
+            rate_sum += rate_table[j];
+            if (v < rate_sum || j == rate_table.length - 1) {
+                base_arr[j] += 1;
+                break;
+            }
+        }
+    }
+}
+
+// Add n drops to base_arr. floor(n/400) drop packs added and the rest are generated.
+// It is adviced to call this function with size=400n. 123123123
+function gen_drop_pack(base_arr, type, size) {
+    // Get drop table
+    var drop_table = get_drop_table(type);
+
+    // Align base_arr and drop table.
+    while (base_arr.length < drop_table.rate_table.length) base_arr.push(0);
+
+    // If the drop pack size is too large, skip some of them
+    const MIN_DROP_PACK_SIZE = 400;
+    var min_drop_pack_count = Math.floor(size / MIN_DROP_PACK_SIZE);
+    for (var i = 0; i < drop_table.rate_table.length; i++) {
+        base_arr[i] += drop_table.rate_table[i] * MIN_DROP_PACK_SIZE * min_drop_pack_count;
+    }
+    base_arr[0] += drop_table.lvl1 * MIN_DROP_PACK_SIZE * min_drop_pack_count;
+    size -= MIN_DROP_PACK_SIZE * min_drop_pack_count;
+    for (var i = 0; i < size; i++) {
+        gen_drop(base_arr, type);
+    }
+}
+
+
+function get_drop_pack_base_num(type, size) {
+    var drop_pack = [];
+    gen_drop_pack(drop_pack, type, size);
+    var base_num = 0;
+    for (var i = 0; i < drop_pack.length; i++) {
+        base_num += drop_pack[i] * Math.pow(3, i);
+    }
+    return base_num;
+}
+//#endregion
+
+//#region Merge
 // Merge items in the current array. This function modifies current.
 function merge(current, goal, mode) {
     // align array lengths.
@@ -43,11 +125,13 @@ function merge_legacy(arr, mode, lvl) {
     merge(arr_copy, goal, mode);
     return arr_copy;
 }
+//#endregion
 
+//#region Run Single
 function satisfied(current, goal) {
     for (var i = 0; i < goal.length; i++) {
         if (i >= current.length && goal[i] >= 0) return false;
-        if (goal[i] >= current[i]) return false;
+        if (goal[i] > current[i]) return false;
     }
     return true;
 }
@@ -71,38 +155,6 @@ function run_single(current, goal, mode, type) {
 
     // Start calculating drop.
     var addcnt = 0;
-
-    // If request num is very high, skip some of them.
-    if (request_num > 10000) {
-        console.log("drop skip enabled");
-        var drop_pack_size = 400;
-        var drop_pack_base_num = get_drop_pack_base_num(type, drop_pack_size);
-        var drop_pack_multiplier = Math.floor(request_num / drop_pack_base_num);
-        var ascending = true;
-        
-        while (true) {
-            var current_temp = current_copy.slice();
-            gen_drop_pack(current_temp, type, drop_pack_size * drop_pack_multiplier);
-            if (ascending) {
-                if (satisfied(current, goal)) {
-                    current_copy = arr_temp;
-                    addcnt += drop_pack_count * drop_pack_multiplier;
-                    drop_pack_multiplier *= 2;
-                }
-                else {
-                    ascending = false;
-                    drop_pack_multiplier = Math.floor(drop_pack_multiplier / 2);
-                }
-            } else {
-                if (arr_temp[lvl - 1] < num) {
-                    current_copy = arr_temp;
-                    addcnt += drop_pack_count * drop_pack_multiplier;
-                }
-                drop_pack_multiplier = Math.floor(drop_pack_multiplier / 2);
-                if (drop_pack_multiplier <= 1) break;
-            }
-        }
-    }
     while (!satisfied(current_copy, goal)) {
         addcnt += 1;
         gen_drop(current_copy, type);
@@ -112,14 +164,17 @@ function run_single(current, goal, mode, type) {
 }
 
 function run_single_legacy(arr, mode, lvl, num, type) {
-    var goal = [num];
+    var goal = [];
     for (var i = 1; i < lvl; i++) {
         goal.push(0);
-    }   
+    }
+    goal.push(num);
     var result = run_single(arr, goal, mode, type);
     return result;
 }
+//#endregion
 
+//#region Full Run
 function isdigit(chr) {
     var cc = chr.charCodeAt(0);
     return cc >= 48 && cc <= 57;
@@ -203,10 +258,10 @@ function runimpl(seq_str, lvl, num, rep, type) {
         ];
     }
 }
+//#endregion
 
 self.addEventListener("message", (e) => {
     if (e.data.msg === "start") {
-        importScripts("./drops.js");
         try {
             var result = runimpl(e.data.seq_str, e.data.lvl, e.data.num, e.data.rep, e.data.type);
             postMessage({status: "success", result: result});
