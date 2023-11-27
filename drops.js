@@ -44,25 +44,35 @@ function gen_drop(base_arr, type) {
     }
 }
 
-// Add n drops to base_arr.
+// Add n drops to base_arr. floor(n/400) drop packs added and the rest are generated.
+// It is adviced to call this function with size=400n.
 function gen_drop_pack(base_arr, type, size) {
     // Get drop table
     var drop_table = get_drop_table(type);
+
+    // Align base_arr and drop table.
     while (base_arr.length < drop_table.rate_table.length) base_arr.push(0);
 
     // If the drop pack size is too large, skip some of them
     const MIN_DROP_PACK_SIZE = 400;
-    const MERGE_LIMIT = 4000;
-    if (size > MERGE_LIMIT) {
-        var min_drop_pack_count = Math.floor(size / MIN_DROP_PACK_SIZE);
-        var drop_pack_size = min_drop_pack_count * MIN_DROP_PACK_SIZE;
-        for (var i in drop_table.rate_table) {
-            base_arr.push(i * drop_table.pack * drop_pack_size);
-        }
-        base_arr[0] += drop_table.lvl1 * MIN_DROP_PACK_SIZE;
-        size -= drop_pack_size;
+    var min_drop_pack_count = Math.floor(size / MIN_DROP_PACK_SIZE);
+    for (var i = 0; i < drop_table.rate_table.length; i++) {
+        base_arr[i] += drop_table.rate_table[i] * MIN_DROP_PACK_SIZE * min_drop_pack_count;
     }
-    for (var i = 0; i > size; i++) {
+    base_arr[0] += drop_table.lvl1 * MIN_DROP_PACK_SIZE * min_drop_pack_count;
+    size -= MIN_DROP_PACK_SIZE * min_drop_pack_count;
+    for (var i = 0; i < size; i++) {
         gen_drop(base_arr, type);
     }
+}
+
+
+function get_drop_pack_base_num(type, size) {
+    var drop_pack = [];
+    gen_drop_pack(drop_pack, type, size);
+    var base_num = 0;
+    for (var i = 0; i < drop_pack.length; i++) {
+        base_num += drop_pack[i] * Math.pow(3, i);
+    }
+    return base_num;
 }

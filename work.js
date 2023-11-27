@@ -1,8 +1,7 @@
+// Merge items in the current array. This function modifies current.
 function merge(current, goal, mode) {
-    // Copy current array.
-    var current_copy = []
-    current.forEach(i => { current_copy.push(i); });
-
+    // align array lengths.
+    while (current.length < goal.length) current.push(0);
     var max_lvl = goal.length;
     for (var now_lvl = 1; now_lvl < max_lvl; now_lvl++) {
         var i = now_lvl - 1;
@@ -10,88 +9,115 @@ function merge(current, goal, mode) {
         // If item number is too large, skip some of them
         const MERGE_LIMIT = 5000;
         const UNMERGED_LIMIT = 500;
-        var merged_item_count = current_copy[i] - goal[i];
+        var merged_item_count = current[i] - goal[i];
         if (merged_item_count >= MERGE_LIMIT) {
             // skip 330 objects at one time.
             // default: 110 objects; 
             // 25% return: 120 objects; (100/275 = 120/330)
             // 10% double: 121 objects; (110/300 = 121/330)
             skip_count = Math.floor((merged_item_count - UNMERGED_LIMIT) / 330);
-            current_copy[i] -= 330 * skip_count;
-            if (mode == "def") current_copy[i + 1] += 110 * skip_count;
-            else if (mode == "ret") current_copy[i + 1] += 120 * skip_count;
-            else if (mode == "dbl") current_copy[i + 1] += 121 * skip_count;
+            current[i] -= 330 * skip_count;
+            if (mode == "def") current[i + 1] += 110 * skip_count;
+            else if (mode == "ret") current[i + 1] += 120 * skip_count;
+            else if (mode == "dbl") current[i + 1] += 121 * skip_count;
         }
 
         // Regular merging.
-        while (current_copy[i] - goal[i] >= 3) {
-            current_copy[i] -= 3;
-            current_copy[i + 1] += 1;
+        while (current[i] - goal[i] >= 3) {
+            current[i] -= 3;
+            current[i + 1] += 1;
             if (mode == "ret" && Math.random() < 0.25) {
-                current_copy[i] += 1;
+                current[i] += 1;
             }
             if (mode == "dbl" && Math.random() < 0.1) {
-                current_copy[i + 1] += 1;
+                current[i + 1] += 1;
             }
         }
     }
-    return current_copy;
 }
 
 function merge_legacy(arr, mode, lvl) {
+    var arr_copy = arr.slice();
     var goal = [];
     for (var i = 0; i < lvl; i++) goal.push(0);
-    return merge(arr, goal, mode);
+    merge(arr_copy, goal, mode);
+    return arr_copy;
 }
 
-function run_single_legacy(arr, mode, lvl, num, type) {
-    var arr_copy = merge_legacy(arr, mode, lvl);
-    var result = arr_copy[lvl - 1];
-    if (type == "others") return [result, -1]
-    var addcnt = 0;
-    var drop_pack = [];
-    var drop_pack_count = 400;
-    var drop_pack_multiplier = 1;
-    var ascending = true;
-    if (type == "weapon") drop_pack = [880, 960, 248, 31];
-    else if (type == "talent") drop_pack = [880, 792, 88];
-    else throw Error();
+function satisfied(current, goal) {
+    for (var i = 0; i < goal.length; i++) {
+        if (i >= current.length && goal[i] >= 0) return false;
+        if (goal[i] >= current[i]) return false;
+    }
+    return true;
+}
 
-    var base_num = num * Math.pow(3, lvl - 1);
-    if (base_num > 10000) {
+function run_single(current, goal, mode, type) {
+    var current_copy = current.slice();
+
+    // Calculate expected highest level item number.
+    merge(current_copy, goal, mode);
+    var result = current_copy[goal.length - 1];
+    
+    // If it does not involve drop calculation, directly return.
+    if (type == "others") return [result, -1];
+
+    // Calculate the base request num (all items converted to level 1)
+    var request_num = 0;
+    for (var i = 0; i < current_copy.length; i++) {
+        var cur_level_request = Math.max(goal[i] - current_copy[i], 0);
+        request_num += cur_level_request * Math.pow(3, i);
+    }
+
+    // Start calculating drop.
+    var addcnt = 0;
+
+    // If request num is very high, skip some of them.
+    if (request_num > 10000) {
+        console.log("drop skip enabled");
+        var drop_pack_size = 400;
+        var drop_pack_base_num = get_drop_pack_base_num(type, drop_pack_size);
+        var drop_pack_multiplier = Math.floor(request_num / drop_pack_base_num);
+        var ascending = true;
+        
         while (true) {
-            var arr_temp = [];
-            arr_copy.forEach(i => { arr_temp.push(i); });
-            for (var i = 0; i < drop_pack.length; i++) {
-                arr_temp[i] = arr_temp[i] + drop_pack[i] * drop_pack_multiplier;
-            }
-            arr_temp = merge_legacy(arr_temp, mode, lvl);
+            var current_temp = current_copy.slice();
+            gen_drop_pack(current_temp, type, drop_pack_size * drop_pack_multiplier);
             if (ascending) {
-                if (arr_temp[lvl - 1] < num) {
-                    arr_copy = arr_temp;
+                if (satisfied(current, goal)) {
+                    current_copy = arr_temp;
                     addcnt += drop_pack_count * drop_pack_multiplier;
                     drop_pack_multiplier *= 2;
                 }
                 else {
                     ascending = false;
-                    drop_pack_multiplier /= 2;
+                    drop_pack_multiplier = Math.floor(drop_pack_multiplier / 2);
                 }
             } else {
                 if (arr_temp[lvl - 1] < num) {
-                    arr_copy = arr_temp;
+                    current_copy = arr_temp;
                     addcnt += drop_pack_count * drop_pack_multiplier;
                 }
-                drop_pack_multiplier /= 2;
+                drop_pack_multiplier = Math.floor(drop_pack_multiplier / 2);
                 if (drop_pack_multiplier <= 1) break;
             }
         }
     }
-    while (arr_copy[lvl - 1] < num) {
+    while (!satisfied(current_copy, goal)) {
         addcnt += 1;
-        gen_drop(arr_copy, type);
-        arr_copy = merge_legacy(arr_copy, mode, lvl);
+        gen_drop(current_copy, type);
+        merge(current_copy, goal, mode);
     }
     return [result, addcnt];
+}
+
+function run_single_legacy(arr, mode, lvl, num, type) {
+    var goal = [num];
+    for (var i = 1; i < lvl; i++) {
+        goal.push(0);
+    }   
+    var result = run_single(arr, goal, mode, type);
+    return result;
 }
 
 function isdigit(chr) {
