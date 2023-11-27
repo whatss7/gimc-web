@@ -1,27 +1,47 @@
-function merge(arr, mode, lvl) {
-    arr_copy = []
-    arr.forEach(i => { arr_copy.push(i); });
-    for (var now_lvl = 1; now_lvl < lvl; now_lvl++) {
+function merge(current, goal, mode) {
+    // Copy current array.
+    var current_copy = []
+    current.forEach(i => { current_copy.push(i); });
+
+    var max_lvl = goal.length;
+    for (var now_lvl = 1; now_lvl < max_lvl; now_lvl++) {
         var i = now_lvl - 1;
-        if (arr_copy[i] >= 10000) {
-            skip_count = Math.ceil((arr_copy[i] - 1000) / 330);
-            arr_copy[i] -= 330 * skip_count;
-            if (mode == "def") arr_copy[i + 1] += 110 * skip_count;
-            else if (mode == "ret") arr_copy[i + 1] += 120 * skip_count;
-            else if (mode == "dbl") arr_copy[i + 1] += 121 * skip_count;
+
+        // If there's a large portion of item to be merged, skip some of them
+        const MERGE_LIMIT = 10000;
+        const UNMERGED_LIMIT = 500;
+        var merged_item_count = current_copy[i] - goal;
+        if (merged_item_count >= MERGE_LIMIT) {
+            // skip 330 objects at one time.
+            // default: 110 objects; 
+            // 25% return: 120 objects; (100/275 = 120/330)
+            // 10% double: 121 objects; (110/300 = 121/330)
+            skip_count = Math.floor((merged_item_count - UNMERGED_LIMIT) / 330);
+            current_copy[i] -= 330 * skip_count;
+            if (mode == "def") current_copy[i + 1] += 110 * skip_count;
+            else if (mode == "ret") current_copy[i + 1] += 120 * skip_count;
+            else if (mode == "dbl") current_copy[i + 1] += 121 * skip_count;
         }
-        while (arr_copy[i] >= 3) {
-            arr_copy[i] -= 3;
-            arr_copy[i + 1] += 1;
+
+        // Regular merging.
+        while (current_copy[i] - goal[i] >= 3) {
+            current_copy[i] -= 3;
+            current_copy[i + 1] += 1;
             if (mode == "ret" && Math.random() < 0.25) {
-                arr_copy[i] += 1;
+                current_copy[i] += 1;
             }
             if (mode == "dbl" && Math.random() < 0.1) {
-                arr_copy[i + 1] += 1;
+                current_copy[i + 1] += 1;
             }
         }
     }
-    return arr_copy;
+    return current_copy;
+}
+
+function merge_legacy(arr, mode, lvl) {
+    var goal = [];
+    for (var i = 0; i < lvl; i++) goal.push(0);
+    return merge(arr, goal, mode);
 }
 
 function gendrop(arr, type) {
@@ -97,7 +117,7 @@ function gendroppack(arr, type) {
 }
 
 function runsingle(arr, mode, lvl, num, type) {
-    var arr_copy = merge(arr, mode, lvl);
+    var arr_copy = merge_legacy(arr, mode, lvl);
     var result = arr_copy[lvl - 1];
     if (type == "others") return [result, -1]
     var addcnt = 0;
@@ -117,7 +137,7 @@ function runsingle(arr, mode, lvl, num, type) {
             for (var i = 0; i < drop_pack.length; i++) {
                 arr_temp[i] = arr_temp[i] + drop_pack[i] * drop_pack_multiplier;
             }
-            arr_temp = merge(arr_temp, mode, lvl);
+            arr_temp = merge_legacy(arr_temp, mode, lvl);
             if (ascending) {
                 if (arr_temp[lvl - 1] < num) {
                     arr_copy = arr_temp;
@@ -141,7 +161,7 @@ function runsingle(arr, mode, lvl, num, type) {
     while (arr_copy[lvl - 1] < num) {
         addcnt += 1;
         gendrop(arr_copy, type);
-        arr_copy = merge(arr_copy, mode, lvl);
+        arr_copy = merge_legacy(arr_copy, mode, lvl);
     }
     return [result, addcnt];
 }
