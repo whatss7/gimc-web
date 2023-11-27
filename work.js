@@ -7,10 +7,10 @@ function merge(current, goal, mode) {
     for (var now_lvl = 1; now_lvl < max_lvl; now_lvl++) {
         var i = now_lvl - 1;
 
-        // If there's a large portion of item to be merged, skip some of them
-        const MERGE_LIMIT = 10000;
+        // If item number is too large, skip some of them
+        const MERGE_LIMIT = 5000;
         const UNMERGED_LIMIT = 500;
-        var merged_item_count = current_copy[i] - goal;
+        var merged_item_count = current_copy[i] - goal[i];
         if (merged_item_count >= MERGE_LIMIT) {
             // skip 330 objects at one time.
             // default: 110 objects; 
@@ -44,79 +44,7 @@ function merge_legacy(arr, mode, lvl) {
     return merge(arr, goal, mode);
 }
 
-function gendrop(arr, type) {
-    var lvl1_base = 0;
-    var lvl1_rate = 0;
-    var pack_base = 0;
-    var pack_rate = 0;
-    var rate_table = [1];
-    if (type == "weapon") {
-        lvl1_base = 2;
-        lvl1_rate = 0.2;
-        pack_base = 3;
-        pack_rate = 0.1;
-        rate_table = [0, 0.775, 0.2, 0.025];
-    } else if (type == "talent") {
-        lvl1_base = 2;
-        lvl1_rate = 0.2;
-        pack_base = 2;
-        pack_rate = 0.2;
-        rate_table = [0, 0.9, 0.1];
-    } else throw new Error();
-
-    if (Math.random() < lvl1_rate) lvl1_base += 1;
-    if (Math.random() < pack_rate) pack_base += 1;
-    arr[0] += lvl1_base;
-    for (var i = 0; i < pack_base; i++) {
-        var v = Math.random();
-        var a = 0;
-        for (var j = 0; j < rate_table.length; j++) {
-            a += rate_table[j];
-            if (v < a || j == rate_table.length - 1) {
-                arr[j] += 1;
-                break;
-            }
-        }
-    }
-}
-
-function gendroppack(arr, type) {
-    var lvl1_base = 0;
-    var lvl1_rate = 0;
-    var pack_base = 0;
-    var pack_rate = 0;
-    var rate_table = [1];
-    if (type == "weapon") {
-        lvl1_base = 2;
-        lvl1_rate = 0.2;
-        pack_base = 3;
-        pack_rate = 0.1;
-        rate_table = [0, 0.775, 0.2, 0.025];
-    } else if (type == "talent") {
-        lvl1_base = 2;
-        lvl1_rate = 0.2;
-        pack_base = 2;
-        pack_rate = 0.2;
-        rate_table = [0, 0.9, 0.1];
-    } else throw new Error();
-
-    if (Math.random() < lvl1_rate) lvl1_base += 1;
-    if (Math.random() < pack_rate) pack_base += 1;
-    arr[0] += lvl1_base;
-    for (var i = 0; i < pack_base; i++) {
-        var v = Math.random();
-        var a = 0;
-        for (var j = 0; j < rate_table.length; j++) {
-            a += rate_table[j];
-            if (v < a || j == rate_table.length - 1) {
-                arr[j] += 1;
-                break;
-            }
-        }
-    }
-}
-
-function runsingle(arr, mode, lvl, num, type) {
+function run_single_legacy(arr, mode, lvl, num, type) {
     var arr_copy = merge_legacy(arr, mode, lvl);
     var result = arr_copy[lvl - 1];
     if (type == "others") return [result, -1]
@@ -160,7 +88,7 @@ function runsingle(arr, mode, lvl, num, type) {
     }
     while (arr_copy[lvl - 1] < num) {
         addcnt += 1;
-        gendrop(arr_copy, type);
+        gen_drop(arr_copy, type);
         arr_copy = merge_legacy(arr_copy, mode, lvl);
     }
     return [result, addcnt];
@@ -204,7 +132,7 @@ function runimpl(seq_str, lvl, num, rep, type) {
     console.log(arr);
     var ret_cnt = 0;
     var dbl_cnt = 0;
-    var def_num = runsingle(arr, "def", lvl, num, type)[0];
+    var def_num = run_single_legacy(arr, "def", lvl, num, type)[0];
     var ret_num = 0;
     var dbl_num = 0;
     var def_addcnt = 0;
@@ -212,18 +140,18 @@ function runimpl(seq_str, lvl, num, rep, type) {
     var dbl_addcnt = 0;
     if (type != "others") {
         for (var i = 0; i < rep; i++) {
-            var r = runsingle(arr, "def", lvl, num, type);
+            var r = run_single_legacy(arr, "def", lvl, num, type);
             def_addcnt += r[1];
         }
     }
     for (var i = 0; i < rep; i++) {
-        var r = runsingle(arr, "ret", lvl, num, type);
+        var r = run_single_legacy(arr, "ret", lvl, num, type);
         if (r[0] >= num) ret_cnt += 1;
         ret_num += r[0];
         ret_addcnt += r[1];
     }
     for (var i = 0; i < rep; i++) {
-        var r = runsingle(arr, "dbl", lvl, num, type);
+        var r = run_single_legacy(arr, "dbl", lvl, num, type);
         if (r[0] >= num) dbl_cnt += 1;
         dbl_num += r[0];
         dbl_addcnt += r[1];
@@ -252,6 +180,7 @@ function runimpl(seq_str, lvl, num, rep, type) {
 
 self.addEventListener("message", (e) => {
     if (e.data.msg === "start") {
+        importScripts("./drops.js");
         try {
             var result = runimpl(e.data.seq_str, e.data.lvl, e.data.num, e.data.rep, e.data.type);
             postMessage({status: "success", result: result});
