@@ -177,16 +177,6 @@ function run_single(current, goal, mode, type) {
     }
     return [result, addcnt];
 }
-
-function run_single_legacy(arr, mode, lvl, num, type) {
-    var goal = [];
-    for (var i = 1; i < lvl; i++) {
-        goal.push(0);
-    }
-    goal.push(num);
-    var result = run_single(arr, goal, mode, type);
-    return result;
-}
 //#endregion
 
 //#region Full Run
@@ -195,11 +185,7 @@ function isdigit(chr) {
     return cc >= 48 && cc <= 57;
 }
 
-function runimpl(seq_str, lvl, num, rep, type) {
-    lvl = Number(lvl);
-    if (lvl > 10) throw new Error();
-    num = Number(num);
-    rep = Number(rep);
+function parse_sequence(seq_str) {
     var seq_str_pre = ""
     for (var i = 0; i < seq_str.length; i++) {
         if (isdigit(seq_str[i])){
@@ -222,56 +208,57 @@ function runimpl(seq_str, lvl, num, rep, type) {
     console.log(str_arr);
     var arr = [];
     for (var i = str_arr.length - 1; i >= 0; i--) {
-        arr.push(Number(str_arr[i]));
-    }
-    while (arr.length < lvl) arr.push(0);
-    console.log(arr);
-    var ret_cnt = 0;
-    var dbl_cnt = 0;
-    var def_num = run_single_legacy(arr, "def", lvl, num, type)[0];
-    var ret_num = 0;
-    var dbl_num = 0;
-    var def_addcnt = 0;
-    var ret_addcnt = 0;
-    var dbl_addcnt = 0;
-    if (type != "others") {
-        for (var i = 0; i < rep; i++) {
-            var r = run_single_legacy(arr, "def", lvl, num, type);
-            def_addcnt += r[1];
+        if (str_arr[i] != "") {
+            arr.push(Number(str_arr[i]));
         }
     }
+    console.log(arr);
+    return arr;
+}
+
+function run_one_mode(current, goal, mode, type, rep) {
+    const DICT = {
+        "def": "不使用",
+        "ret": "25%返还",
+        "dbl": "10%双倍"
+    };
+    var success_count = 0, result_sum = 0, drop_sum = 0;
     for (var i = 0; i < rep; i++) {
-        var r = run_single_legacy(arr, "ret", lvl, num, type);
-        if (r[0] >= num) ret_cnt += 1;
-        ret_num += r[0];
-        ret_addcnt += r[1];
+        var [result, drop_count] = run_single(current, goal, mode, type);
+        if (drop_count == 0) success_count += 1;
+        result_sum += result;
+        drop_sum += drop_count;
     }
-    for (var i = 0; i < rep; i++) {
-        var r = run_single_legacy(arr, "dbl", lvl, num, type);
-        if (r[0] >= num) dbl_cnt += 1;
-        dbl_num += r[0];
-        dbl_addcnt += r[1];
-    }
-    var ret_rate = ret_cnt / rep * 100;
-    var dbl_rate = dbl_cnt / rep * 100;
-    ret_num /= rep;
-    dbl_num /= rep;
-    def_addcnt /= rep;
-    ret_addcnt /= rep;
-    dbl_addcnt /= rep;
-    if (type != "others") {
-        return [
-            "不使用：" + def_num.toFixed(0) + "，刷" + def_addcnt.toFixed(2) + "次/" + (def_addcnt * 20).toFixed(2) + "树脂",
-            "25%返还：" + ret_num.toFixed(2) + "/" + ret_rate.toFixed(2) + "%" + "，刷" + ret_addcnt.toFixed(2) + "次/" + (ret_addcnt * 20).toFixed(2) + "树脂",
-            "10%双倍：" + dbl_num.toFixed(2) + "/" + dbl_rate.toFixed(2) + "%" + "，刷" + dbl_addcnt.toFixed(2) + "次/" + (dbl_addcnt * 20).toFixed(2) + "树脂"
-        ];
+    var result = "";
+    if (mode == "def") {
+        result += DICT[mode] + "：" + (result_sum / rep).toFixed(0);
     } else {
-        return [
-            "不使用：" + def_num.toFixed(0),
-            "25%返还：" + ret_num.toFixed(2) + "/" + ret_rate.toFixed(2) + "%",
-            "10%双倍：" + dbl_num.toFixed(2) + "/" + dbl_rate.toFixed(2) + "%"
-        ];
+        result += DICT[mode] + "：" + (result_sum / rep).toFixed(2);
+        if (mode != "def") result += "/" + (success_count / rep * 100).toFixed(2) + "%";
     }
+    if (type != "others") {
+        result += "，刷" + (drop_sum / rep).toFixed(2) + "次";
+        result += "/" + (drop_sum / rep * 20).toFixed(2) + "树脂";
+    }
+    return result;
+}
+
+function runimpl(seq_str, lvl, num, rep, type) {
+    lvl = Number(lvl);
+    if (lvl > 10) throw new Error();
+    num = Number(num);
+    rep = Number(rep);
+    var arr = parse_sequence(seq_str);
+    var goal = [];
+    for (var i = 1; i < lvl; i++) {
+        goal.push(0);
+    }
+    goal.push(num);
+    return [
+        run_one_mode(arr, goal, "def", type, rep),
+        run_one_mode(arr, goal, "ret", type, rep),
+        run_one_mode(arr, goal, "dbl", type, rep)
+    ];
 }
 //#endregion
 
