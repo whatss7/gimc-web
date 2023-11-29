@@ -117,14 +117,6 @@ function merge(current, goal, mode) {
         }
     }
 }
-
-function merge_legacy(arr, mode, lvl) {
-    var arr_copy = arr.slice();
-    var goal = [];
-    for (var i = 0; i < lvl; i++) goal.push(0);
-    merge(arr_copy, goal, mode);
-    return arr_copy;
-}
 //#endregion
 
 //#region Run Single
