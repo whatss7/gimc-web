@@ -46,7 +46,7 @@ function gen_drop(base_arr, type) {
 }
 
 // Add n drops to base_arr. floor(n/400) drop packs added and the rest are generated.
-// It is adviced to call this function with size=400n. 123123123
+// It is adviced to call this function with size=400n.
 function gen_drop_pack(base_arr, type, size) {
     // Get drop table
     var drop_table = get_drop_table(type);
@@ -58,7 +58,7 @@ function gen_drop_pack(base_arr, type, size) {
     const MIN_DROP_PACK_SIZE = 400;
     var min_drop_pack_count = Math.floor(size / MIN_DROP_PACK_SIZE);
     for (var i = 0; i < drop_table.rate_table.length; i++) {
-        base_arr[i] += drop_table.rate_table[i] * MIN_DROP_PACK_SIZE * min_drop_pack_count;
+        base_arr[i] += drop_table.rate_table[i] * drop_table.pack * MIN_DROP_PACK_SIZE * min_drop_pack_count;
     }
     base_arr[0] += drop_table.lvl1 * MIN_DROP_PACK_SIZE * min_drop_pack_count;
     size -= MIN_DROP_PACK_SIZE * min_drop_pack_count;
@@ -142,6 +142,7 @@ function run_single(current, goal, mode, type) {
     // Calculate expected highest level item number.
     merge(current_copy, goal, mode);
     var result = current_copy[goal.length - 1];
+    var addcnt = 0;
     
     // If it does not involve drop calculation, directly return.
     if (type == "others") return [result, -1];
@@ -153,8 +154,30 @@ function run_single(current, goal, mode, type) {
         request_num += cur_level_request * Math.pow(3, i);
     }
 
+    const DROP_BASE_LIMIT = 5000;
+    // If the requested number is too large, skip some of them.
+    if (request_num >= DROP_BASE_LIMIT) {
+        // First do binary lifting, then do binary searching.
+        var last_unsat = current_copy.slice();
+        var pack_count = 1;
+        var ascend = true;
+        const PACK_SIZE = 400;
+        while (pack_count >= 1) {
+            gen_drop_pack(current_copy, type, pack_count * PACK_SIZE);
+            merge(current_copy, goal, mode);
+            if (satisfied(current_copy, goal)) {
+                current_copy = last_unsat.slice();
+                ascend = false;
+            } else {
+                last_unsat = current_copy.slice();
+                addcnt += pack_count * PACK_SIZE;
+            }
+            if (ascend) pack_count *= 2;
+            else pack_count /= 2;
+        }
+    }
+
     // Start calculating drop.
-    var addcnt = 0;
     while (!satisfied(current_copy, goal)) {
         addcnt += 1;
         gen_drop(current_copy, type);
