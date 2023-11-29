@@ -40,9 +40,9 @@
 	<div style="margin: 0 auto; text-align: center; max-width: 500px">
 		<div class="flexdiv">
 			<p>目标为：</p>
-			<input id="lvlText" type="number" value="3" min="1" max="20" style="width: 100%; min-width: 0" />
+			<input id="lvlText" type="number" value="3" min="1" max="10" style="width: 100%; min-width: 0" />
 			<p>级材料</p>
-			<input id="numText" type="number" value="16" style="width: 100%; min-width: 0" />
+			<input id="numText" type="number" value="16" min="0" style="width: 100%; min-width: 0" />
 			<p>个</p>
 		</div>
 		<div class="flexdiv">
@@ -88,10 +88,17 @@
 			<p id="resultTextDouble">然后选择你的目标材料等级和数目，点击“运行”，这里就会显示计算结果</p>
 		</div>
 		<div class="flexdiv">
-			<p>其他设置：</p>
-			<p>模拟重复次数：</p>
-			<input id="repText" type="number" min="1" value="1000" style="width: 100%; min-width: 0" />
-			<p>次</p>
+			<input type="button" style="width: 100%; margin: 5px;" value="其他设置" onclick="document.querySelector('dialog').showModal()" />
+			<dialog >
+				<div class="flexdiv">
+					<p>模拟重复次数：</p>
+					<input id="repText" type="number" min="1" value="1000" style="width: 100%; min-width: 0" />
+					<p>次</p>
+				</div>
+				<form method="dialog">
+					<button>OK</button>
+				</form>
+			</dialog>
 		</div>
 	</div>
 	<script>
