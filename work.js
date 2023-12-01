@@ -180,41 +180,6 @@ function run_single(current, goal, mode, type) {
 //#endregion
 
 //#region Full Run
-function isdigit(chr) {
-    var cc = chr.charCodeAt(0);
-    return cc >= 48 && cc <= 57;
-}
-
-function parse_sequence(seq_str) {
-    var seq_str_pre = ""
-    for (var i = 0; i < seq_str.length; i++) {
-        if (isdigit(seq_str[i])){
-            seq_str_pre += seq_str[i];
-        }
-        else {
-            if ((seq_str[i] == "-") && 
-                (i == 0 || !isdigit(seq_str[i - 1]) && seq_str[i - 1] != "-") &&
-                (i != seq_str.length - 1 && isdigit(seq_str[i + 1]))
-            ) {
-                seq_str_pre += "-";
-            } else if (!seq_str_pre.endsWith(" ")) {
-                seq_str_pre += " ";
-            }
-        }
-    }
-    console.log(seq_str_pre);
-    seq_str_pre = seq_str_pre.trim();
-    var str_arr = seq_str_pre.split(" ");
-    console.log(str_arr);
-    var arr = [];
-    for (var i = str_arr.length - 1; i >= 0; i--) {
-        if (str_arr[i] != "") {
-            arr.push(Number(str_arr[i]));
-        }
-    }
-    console.log(arr);
-    return arr;
-}
 
 function run_one_mode(current, goal, mode, type, rep) {
     const DICT = {
@@ -243,21 +208,11 @@ function run_one_mode(current, goal, mode, type, rep) {
     return result;
 }
 
-function runimpl(seq_str, lvl, num, rep, type) {
-    lvl = Number(lvl);
-    if (lvl > 10) throw new Error();
-    num = Number(num);
-    rep = Number(rep);
-    var arr = parse_sequence(seq_str);
-    var goal = [];
-    for (var i = 1; i < lvl; i++) {
-        goal.push(0);
-    }
-    goal.push(num);
+function runimpl(current, goal, type, rep) {
     return [
-        run_one_mode(arr, goal, "def", type, rep),
-        run_one_mode(arr, goal, "ret", type, rep),
-        run_one_mode(arr, goal, "dbl", type, rep)
+        run_one_mode(current, goal, "def", type, rep),
+        run_one_mode(current, goal, "ret", type, rep),
+        run_one_mode(current, goal, "dbl", type, rep)
     ];
 }
 //#endregion
@@ -265,10 +220,12 @@ function runimpl(seq_str, lvl, num, rep, type) {
 self.addEventListener("message", (e) => {
     if (e.data.msg === "start") {
         try {
-            var result = runimpl(e.data.seq_str, e.data.lvl, e.data.num, e.data.rep, e.data.type);
+            var result = runimpl(e.data.current, e.data.goal, e.data.type, e.data.rep);
             postMessage({status: "success", result: result});
         } catch (ex) {
             postMessage({status: "failed", result: ex});
         }
+    } else {
+        postMessage({status: "failed", result: Error("Unknown message")});
     }
 });
