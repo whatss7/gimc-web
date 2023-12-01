@@ -13,12 +13,22 @@
 
 <body>
 	<div style="margin: 0 auto; text-align: center; max-width: 500px">
-		<div class="flexdiv">
-			<p>目标为：</p>
-			<input id="lvlText" type="number" value="3" min="1" max="10" style="width: 100%; min-width: 0" />
-			<p>级材料</p>
-			<input id="numText" type="number" value="16" min="0" style="width: 100%; min-width: 0" />
-			<p>个</p>
+		<div>
+			<div id="traditional_input_div">
+				<div class="flexdiv" >
+					<p>目标为：</p>
+					<input id="lvlText" type="number" value="3" min="1" max="10" style="width: 100%; min-width: 0" />
+					<p>级材料</p>
+					<input id="numText" type="number" value="16" min="0" style="width: 100%; min-width: 0" />
+					<p>个</p>
+				</div>
+			</div>
+			<div id="sequential_input_div" hidden>
+				<div class="flexdiv">
+					<p>目标物品序列：</p>
+					<input id="goalText" type="text" size="1" style="width: 100%; min-width: 0" />
+				</div>
+			</div>
 		</div>
 		<div class="flexdiv">
 			<p>类型为：</p>
@@ -30,11 +40,11 @@
 			<label for="type_others">其他</label>
 		</div>
 
-		<div class="buttonlist" style="margin: 5px 0px;">
+		<div class="vertical_list" style="margin: 5px 0px;">
 			<input type="button" value="显示/隐藏快捷按钮" onclick="chghide()"/>
 		</div>
 		<div id="fastbtns" hidden>
-			<div class="buttonlist">
+			<div class="vertical_list">
 				<input type="button" value="12个3级（天赋8-9级）" onclick="setval(12, 3, 1)" />
 				<input type="button" value="16个3级（天赋9-10级）" onclick="setval(16, 3, 1)" />
 				<input type="button" value="24个3级（角色80级突破）" onclick="setval(24, 3, 2)" />
@@ -45,7 +55,7 @@
 		</div>
 
 		<div class="flexdiv">
-			<p>当前拥有的物品序列：</p>
+			<p>当前物品序列：</p>
 			<input id="inputText" type="text" size="1" style="width: 100%; min-width: 0" />
 		</div>
 
@@ -60,7 +70,7 @@
 			<p id="resultTextDouble">然后选择你的目标材料等级和数目，点击“运行”，这里就会显示计算结果</p>
 		</div>
 
-		<div class="buttonlist">
+		<div class="vertical_list">
 			<input type="button" value="设置" onclick="open_settings()"/>
 		</div>
 
@@ -68,8 +78,14 @@
 		<div id="settings_popup">
 			<div class="flexdiv">
 				<p>模拟重复次数：</p>
-				<input id="repText" type="number" min="1" value="1000" style="width: 100%; min-width: 0" />
+				<input id="repText" type="number" min="1" value="1000"/>
 				<p>次</p>
+			</div>
+			<div class="vertical_list">
+				<div>
+					<input type="checkbox" id="sequential_input_checkbox"/>
+					<label for="sequential_input_checkbox">目标使用序列输入</p>
+				</div>
 			</div>
 			<input type="button" value="保存" onclick="save_settings()" />
 			<input type="button" value="取消" onclick="discard_settings()" />

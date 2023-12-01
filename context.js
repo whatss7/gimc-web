@@ -1,6 +1,7 @@
 var running = false;
 var settings = {
 	repeat: "1000",
+	sequential_input: false,
 };
 
 function run() {
@@ -54,12 +55,21 @@ function open_settings() {
 	document.getElementById('settings_popup').style.display = 'block';
 	document.getElementById('overlay').style.display = 'block';
 	document.getElementById("repText").value = settings.repeat;
+	document.getElementById("sequential_input_checkbox").checked = settings.sequential_input;
 }
 
 function save_settings() {
 	document.getElementById('settings_popup').style.display = 'none';
 	document.getElementById('overlay').style.display = 'none';
 	settings.repeat = document.getElementById("repText").value;
+	settings.sequential_input = document.getElementById("sequential_input_checkbox").checked;
+	if (settings.sequential_input) {
+		document.getElementById('traditional_input_div').hidden = true;
+		document.getElementById('sequential_input_div').hidden = false;
+	} else {
+		document.getElementById('traditional_input_div').hidden = false;
+		document.getElementById('sequential_input_div').hidden = true;
+	}
 }
 
 function discard_settings() {

@@ -25,20 +25,32 @@
     flex: 0 0 auto;
 }
 
-.buttonlist {
+.vertical_list {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
 }
 
-.buttonlist input {
+.vertical_list input[type="button"] {
     width: 100%;
     margin: 5px;
 }
 
 #scene {
     border: 1px solid black;
+}
+
+#talents_popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    z-index: 1000;
 }
 
 #settings_popup {
