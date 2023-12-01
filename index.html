@@ -7,32 +7,7 @@
 		charset="UTF-8" />
 	<title>gimc-web</title>
 	<script type="text/javascript" src="./context.js"></script>
-	<style type="text/css">
-		.container {
-			margin: 0 auto;
-			text-align: center;
-		}
-
-		.inline {
-			display: inline-block;
-		}
-
-		.flexdiv {
-			display: flex;
-			align-items: center;
-		}
-
-		.flexdiv input {
-			margin: 10px;
-		}
-
-		.flexdiv p {
-			flex: 0 0 auto;
-		}
-
-		#scene {
-			border: 1px solid black;
-		}
+	<link rel="stylesheet" type="text/css" href="./styles.css">
 	</style>
 </head>
 
@@ -54,30 +29,27 @@
 			<input type="radio" name="material_type" id="type_others" />
 			<label for="type_others">其他</label>
 		</div>
-		<div class="flexdiv" style="flex-direction: column;">
-			<input type="button" value="显示/隐藏快捷按钮" onclick="chghide()" style="width: 100%" />
+
+		<div class="buttonlist" style="margin: 5px 0px;">
+			<input type="button" value="显示/隐藏快捷按钮" onclick="chghide()"/>
 		</div>
 		<div id="fastbtns" hidden>
-			<div class="flexdiv" style="flex-direction: column;">
-				<input type="button" style="width: 100%; margin: 5px;" value="12个3级（天赋8-9级）"
-					onclick="setval(12, 3, 1)" />
-				<input type="button" style="width: 100%; margin: 5px;" value="16个3级（天赋9-10级）"
-					onclick="setval(16, 3, 1)" />
-				<input type="button" style="width: 100%; margin: 5px;" value="24个3级（角色80级突破）"
-					onclick="setval(24, 3, 2)" />
-				<input type="button" style="width: 100%; margin: 5px;" value="3个4级（三星武器80级突破）"
-					onclick="setval(3, 4, 0)" />
-				<input type="button" style="width: 100%; margin: 5px;" value="4个4级（四星武器80级突破）"
-					onclick="setval(4, 4, 0)" />
-				<input type="button" style="width: 100%; margin: 5px;" value="6个4级（五星武器80级突破）"
-					onclick="setval(6, 4, 0)" />
+			<div class="buttonlist">
+				<input type="button" value="12个3级（天赋8-9级）" onclick="setval(12, 3, 1)" />
+				<input type="button" value="16个3级（天赋9-10级）" onclick="setval(16, 3, 1)" />
+				<input type="button" value="24个3级（角色80级突破）" onclick="setval(24, 3, 2)" />
+				<input type="button" value="3个4级（三星武器80级突破）" onclick="setval(3, 4, 0)" />
+				<input type="button" value="4个4级（四星武器80级突破）" onclick="setval(4, 4, 0)" />
+				<input type="button" value="6个4级（五星武器80级突破）" onclick="setval(6, 4, 0)" />
 			</div>
 		</div>
+
 		<div class="flexdiv">
 			<p>当前拥有的物品序列：</p>
 			<input id="inputText" type="text" size="1" style="width: 100%; min-width: 0" />
 		</div>
-		<div style="text-align: center;">
+
+		<div>
 			<p class="inline">点击</p>
 			<input class="inline" id="runBtn" type="button" value="运行" onclick="run()" />
 			<p class="inline">得到结果：</p>
@@ -87,18 +59,20 @@
 			<p id="resultTextReturn">请在“当前拥有的物品序列”中从高到低输入你所拥有的材料数目，低级没有需补 0，例如"7 15 0"</p>
 			<p id="resultTextDouble">然后选择你的目标材料等级和数目，点击“运行”，这里就会显示计算结果</p>
 		</div>
-		<div class="flexdiv">
-			<input type="button" style="width: 100%; margin: 5px;" value="其他设置" onclick="document.querySelector('dialog').showModal()" />
-			<dialog >
-				<div class="flexdiv">
-					<p>模拟重复次数：</p>
-					<input id="repText" type="number" min="1" value="1000" style="width: 100%; min-width: 0" />
-					<p>次</p>
-				</div>
-				<form method="dialog">
-					<button>OK</button>
-				</form>
-			</dialog>
+
+		<div class="buttonlist">
+			<input type="button" value="设置" onclick="open_settings()"/>
+		</div>
+
+		<div id="overlay"></div>
+		<div id="settings_popup">
+			<div class="flexdiv">
+				<p>模拟重复次数：</p>
+				<input id="repText" type="number" min="1" value="1000" style="width: 100%; min-width: 0" />
+				<p>次</p>
+			</div>
+			<input type="button" value="保存" onclick="save_settings()" />
+			<input type="button" value="取消" onclick="discard_settings()" />
 		</div>
 	</div>
 	<script>

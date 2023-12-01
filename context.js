@@ -1,4 +1,7 @@
 var running = false;
+var settings = {
+	repeat: "1000",
+};
 
 function run() {
 	if (running) return;
@@ -17,7 +20,7 @@ function run() {
 	else if(document.getElementById("type_others").checked) type = "others";
 
 	const worker = new Worker("./work.js");
-	worker.postMessage({msg: "start", seq_str: seqstr, lvl: lvlstr, num: numstr, rep: repstr, type: type});
+	worker.postMessage({msg: "start", seq_str: seqstr, lvl: lvlstr, num: numstr, rep: settings.repeat, type: type});
 	worker.addEventListener("message", (e) => {
 		if(e.data.status == "success") {
 			var result = e.data.result;
@@ -45,4 +48,21 @@ function setval(num, lvl, type) {
 
 function chghide() {
 	document.getElementById('fastbtns').hidden = !document.getElementById('fastbtns').hidden;
+}
+
+function open_settings() {
+	document.getElementById('settings_popup').style.display = 'block';
+	document.getElementById('overlay').style.display = 'block';
+	document.getElementById("repText").value = settings.repeat;
+}
+
+function save_settings() {
+	document.getElementById('settings_popup').style.display = 'none';
+	document.getElementById('overlay').style.display = 'none';
+	settings.repeat = document.getElementById("repText").value;
+}
+
+function discard_settings() {
+	document.getElementById('settings_popup').style.display = 'none';
+	document.getElementById('overlay').style.display = 'none';
 }
