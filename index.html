@@ -41,17 +41,8 @@
 		</div>
 
 		<div class="vertical_list" style="margin: 5px 0px;">
-			<input type="button" value="显示/隐藏快捷按钮" onclick="chghide()"/>
-		</div>
-		<div id="fastbtns" hidden>
-			<div class="vertical_list">
-				<input type="button" value="12个3级（天赋8-9级）" onclick="setval(12, 3, 1)" />
-				<input type="button" value="16个3级（天赋9-10级）" onclick="setval(16, 3, 1)" />
-				<input type="button" value="24个3级（角色80级突破）" onclick="setval(24, 3, 2)" />
-				<input type="button" value="3个4级（三星武器80级突破）" onclick="setval(3, 4, 0)" />
-				<input type="button" value="4个4级（四星武器80级突破）" onclick="setval(4, 4, 0)" />
-				<input type="button" value="6个4级（五星武器80级突破）" onclick="setval(6, 4, 0)" />
-			</div>
+			<input type="button" value="通过目标等级选择" onclick="open_level_popup()"/>
+			<input type="button" value="快速选择" onclick="open_fast_button()"/>
 		</div>
 
 		<div class="flexdiv">
@@ -64,6 +55,7 @@
 			<input class="inline" id="runBtn" type="button" value="运行" onclick="run()" />
 			<p class="inline">得到结果：</p>
 		</div>
+
 		<div>
 			<p id="resultTextDefault">欢迎使用 gimc-web</p>
 			<p id="resultTextReturn">请在“当前拥有的物品序列”中从高到低输入你所拥有的材料数目，低级没有需补 0，例如"7 15 0"</p>
@@ -75,6 +67,50 @@
 		</div>
 
 		<div id="overlay"></div>
+
+		<div id="level_popup">
+			<div class="flexdiv">
+				<p>类型为：</p>
+				<input type="radio" name="level_material_type" id="level_type_weapon" />
+				<label for="level_type_weapon">武器</label>
+				<input type="radio" name="level_material_type" id="level_type_talent" checked />
+				<label for="level_type_talent">天赋</label>
+			</div>
+			<div id="level_weapon_div">
+				<div class="flexdiv">
+					<p>当前武器等级：</p>
+					<input type="number" min="1" max="90" value="1" id="weapon_level" />
+					<p>/</p>
+					<input type="number" min="20" max="90" step="10" value="20" id="weapon_level" />
+				</div>
+				<div class="flexdiv">
+					<p>目标武器等级：</p>
+					<input type="number" min="1" max="90" value="90" id="weapon_level" />
+					<p>/</p>
+					<input type="number" min="20" max="90" step="10" value="90" id="weapon_level" />
+				</div>
+			</div>
+			<div style="margin: 10px">
+				<input type="button" value="确定" onclick="close_level_popup()"/>
+				<input type="button" value="附加" onclick="close_level_popup()"/>
+				<input type="button" value="取消" onclick="close_level_popup()"/>
+			</div>
+		</div>
+
+		<div id="fast_popup">
+			<div>
+				<div class="vertical_list">
+					<input type="button" value="12个3级（天赋8-9级）" onclick="setval(12, 3, 1); close_fast_button();" />
+					<input type="button" value="16个3级（天赋9-10级）" onclick="setval(16, 3, 1); close_fast_button();" />
+					<input type="button" value="24个3级（角色80级突破）" onclick="setval(24, 3, 2); close_fast_button();" />
+					<input type="button" value="3个4级（三星武器80级突破）" onclick="setval(3, 4, 0); close_fast_button();" />
+					<input type="button" value="4个4级（四星武器80级突破）" onclick="setval(4, 4, 0); close_fast_button();" />
+					<input type="button" value="6个4级（五星武器80级突破）" onclick="setval(6, 4, 0); close_fast_button();" />
+					<input type="button" value="取消" onclick="close_fast_button();" />
+				</div>
+			</div>
+		</div>
+
 		<div id="settings_popup">
 			<div class="flexdiv">
 				<p>模拟重复次数：</p>

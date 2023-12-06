@@ -152,8 +152,24 @@ function setval(num, lvl, type) {
 	}
 }
 
-function chghide() {
-	document.getElementById('fastbtns').hidden = !document.getElementById('fastbtns').hidden;
+function open_fast_button() {
+	document.getElementById('fast_popup').style.display = 'block';
+	document.getElementById('overlay').style.display = 'block';
+}
+
+function close_fast_button() {
+	document.getElementById('fast_popup').style.display = 'none';
+	document.getElementById('overlay').style.display = 'none';
+}
+
+function open_level_popup() {
+	document.getElementById('level_popup').style.display = 'block';
+	document.getElementById('overlay').style.display = 'block';
+}
+
+function close_level_popup() {
+	document.getElementById('level_popup').style.display = 'none';
+	document.getElementById('overlay').style.display = 'none';
 }
 
 function open_settings() {
