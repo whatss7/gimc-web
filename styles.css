@@ -25,6 +25,10 @@
     flex: 0 0 auto;
 }
 
+.flexdiv label {
+    margin-top: 10px;
+}
+
 .vertical_list {
     display: flex;
     flex-direction: column;
