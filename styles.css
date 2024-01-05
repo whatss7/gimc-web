@@ -6,27 +6,18 @@
 .inline {
     display: inline-block;
 }
-
 .flexdiv {
     display: flex;
     align-items: center;
 }
 
+
 .flexdiv input {
-    margin: 10px;
-    padding: 0;
-    box-sizing: border-box;
-    border: 1px solid gray;
-    border-radius: 2px;
-    padding: 2px 3px;
+    margin: 0px 10px;
 }
 
 .flexdiv p {
     flex: 0 0 auto;
-}
-
-.flexdiv label {
-    margin-top: 10px;
 }
 
 .vertical_list {

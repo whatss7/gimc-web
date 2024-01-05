@@ -32,12 +32,18 @@
 		</div>
 		<div class="flexdiv">
 			<p>类型为：</p>
+			<label>
 			<input type="radio" name="material_type" id="type_weapon" />
-			<label for="type_weapon">武器</label>
+				武器
+			</label>
+			<label>
 			<input type="radio" name="material_type" id="type_talent" checked />
-			<label for="type_talent">天赋</label>
+				天赋
+			</label>
+			<label>
 			<input type="radio" name="material_type" id="type_others" />
-			<label for="type_others">其他</label>
+				其他
+			</label>
 		</div>
 
 		<div class="vertical_list" style="margin: 5px 0px;">
@@ -90,30 +96,24 @@
 					<input type="number" min="20" max="90" step="10" value="90" id="weapon_level" />
 				</div>
 			</div>
-			<div id="level_talent_div">
+			<div id="level_talent_div" hidden>
 				<div class="flexdiv">
 					<p>普通攻击：</p>
 					<input type="number" min="1" max="10" value="1" id="talent_a_level" />
 					<p>&rarr;</p>
 					<input type="number" min="1" max="10" value="9" id="talent_a_goal" />
-					<input type="checkbox" id="talent_a_add_level"/>
-					<label for="talent_a_add_level">命座加成</p>
 				</div>
 				<div class="flexdiv">
 					<p>元素战技：</p>
 					<input type="number" min="1" max="10" value="1" id="talent_e_level" />
 					<p>&rarr;</p>
 					<input type="number" min="1" max="10" value="9" id="talent_e_goal" />
-					<input type="checkbox" id="talent_e_add_level"/>
-					<label for="talent_e_add_level">命座加成</p>
 				</div>
 				<div class="flexdiv">
 					<p>元素爆发：</p>
 					<input type="number" min="1" max="10" value="1" id="talent_q_level" />
 					<p>&rarr;</p>
 					<input type="number" min="1" max="10" value="9" id="talent_q_goal" />
-					<input type="checkbox" id="talent_q_add_level"/>
-					<label for="talent_q_add_level">命座加成</p>
 				</div>
 			</div>
 			<div style="margin: 10px">
